@@ -1,13 +1,24 @@
 package main
 
-import "github.com/gin-gonic/gin"
+import (
+	"fmt"
+	"github.com/spf13/viper"
+)
 
 func main() {
-	r := gin.Default()
-	r.GET("/", func(c *gin.Context) {
-		c.JSON(200, gin.H{
-			"message": "hello GoerHub",
-		})
-	})
-	_ = r.Run()
+	// init config
+	err := initConfig()
+	if err != nil {
+		panic(err)
+	}
+	// init App
+	r := initRouter()
+	_ = r.Run(fmt.Sprintf("%s:%s", viper.GetString("app.host"), viper.GetString("app.port")))
+}
+
+func initConfig() error {
+	viper.SetConfigName("config")
+	viper.AddConfigPath("/etc/goerhub")
+	viper.AddConfigPath(".")
+	return viper.ReadInConfig()
 }
