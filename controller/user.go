@@ -5,9 +5,11 @@ import (
 	"github.com/gin-gonic/gin"
 	"goerhubApi/constraint"
 	"goerhubApi/model"
+	"golang.org/x/crypto/bcrypt"
 )
 
 type User struct {
+	Model model.UserModel
 }
 
 func (u *User) Login(c *gin.Context) (interface{}, error) {
@@ -15,10 +17,46 @@ func (u *User) Login(c *gin.Context) (interface{}, error) {
 	if err := c.ShouldBind(&loginRequest); err != nil {
 		return nil, err
 	}
-	user, ok := model.UserModel{}.GetUserInfoByUserEmail(loginRequest.Email)
+	user, ok := u.Model.GetUserInfoByUserEmail(loginRequest.Email)
 	if !ok {
 		return nil, jwt.ErrFailedAuthentication
 	}
 
 	return &user, nil
+}
+
+func (u *User) Register(c *gin.Context) {
+	var registerRequest constraint.RegisterRequest
+	if err := c.ShouldBind(&registerRequest); err != nil {
+		responseError(c, 400, err.Error())
+		return
+	}
+
+	if registerRequest.Password != registerRequest.Password {
+		responseError(c, 400, "Inconsistent passwords twice")
+		return
+	}
+	password := []byte(registerRequest.Password)
+	password, err := bcrypt.GenerateFromPassword(password, bcrypt.DefaultCost)
+	if err != nil {
+		responseError(c, 400, err.Error())
+		return
+	}
+
+	user := model.Users{
+		Nickname: registerRequest.Username,
+		Username: registerRequest.Username,
+		Password: string(password),
+		Email:    registerRequest.Email,
+	}
+
+	err = u.Model.CreateUser(user)
+	if err != nil {
+		responseError(c, 400, err.Error())
+		return
+	}
+
+	c.JSON(200, gin.H{
+		"username": user.Username,
+	})
 }

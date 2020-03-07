@@ -27,3 +27,10 @@ func (UserModel) GetUserInfoByUserEmail(email string) (user Users, ok bool) {
 	}
 	return user, true
 }
+
+func (UserModel) CreateUser(users Users) error {
+	if err := dao.DB().Create(&users).Error; err != nil {
+		return err
+	}
+	return nil
+}
