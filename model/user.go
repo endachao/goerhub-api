@@ -1,6 +1,9 @@
 package model
 
-import "time"
+import (
+	"goerhubApi/dao"
+	"time"
+)
 
 type Users struct {
 	ID            int       `gorm:"primary_key;column:id;type:int(11);not null"`
@@ -13,4 +16,14 @@ type Users struct {
 	GoldNumber    int       `gorm:"column:gold_number;type:int(11);not null"`
 	UpdatedAt     time.Time `gorm:"column:updated_at;type:timestamp"`
 	CreatedAt     time.Time `gorm:"column:created_at;type:timestamp"`
+}
+
+type UserModel struct {
+}
+
+func (UserModel) GetUserInfoByUserEmail(email string) (user Users, ok bool) {
+	if dao.DB().Where("email = ?", email).Take(&user).RecordNotFound() {
+		return
+	}
+	return user, true
 }

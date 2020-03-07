@@ -12,7 +12,6 @@ import (
 var db *gorm.DB
 
 type MysqlConnect struct {
-	DB *gorm.DB
 }
 
 func (m *MysqlConnect) Connect() (err error) {
@@ -33,13 +32,11 @@ func (m *MysqlConnect) Connect() (err error) {
 	db.DB().SetMaxOpenConns(100)
 	db.DB().SetConnMaxLifetime(time.Hour)
 
-	// with main close db
-	m.DB = db
 	return nil
 }
 
 func (m *MysqlConnect) Close() {
-	_ = m.DB.Close()
+	_ = DB().Close()
 }
 
 func DB() *gorm.DB {

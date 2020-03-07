@@ -3,12 +3,14 @@ package main
 import (
 	"fmt"
 	"github.com/spf13/viper"
+	"goerhubApi/config"
 	"goerhubApi/dao"
+	"goerhubApi/routes"
 )
 
 func main() {
 	// init config
-	err := initConfig()
+	err := config.InitConfig()
 	if err != nil {
 		panic(err)
 	}
@@ -21,13 +23,6 @@ func main() {
 	defer mysql.Close()
 
 	// init App
-	r := initRouter()
+	r := routes.InitRouter()
 	_ = r.Run(fmt.Sprintf("%s:%s", viper.GetString("app.host"), viper.GetString("app.port")))
-}
-
-func initConfig() error {
-	viper.SetConfigName("config")
-	viper.AddConfigPath("/etc/goerhub")
-	viper.AddConfigPath(".")
-	return viper.ReadInConfig()
 }
