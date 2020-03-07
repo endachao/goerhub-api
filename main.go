@@ -1,9 +1,9 @@
 package main
 
 import (
-	"api/dao"
 	"fmt"
 	"github.com/spf13/viper"
+	"goerhubApi/dao"
 )
 
 func main() {

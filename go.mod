@@ -1,4 +1,4 @@
-module api
+module goerhubApi
 
 go 1.13
 
