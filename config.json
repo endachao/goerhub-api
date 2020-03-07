@@ -3,5 +3,12 @@
     "host": "127.0.0.1",
     "port": "8080",
     "mode": "debug"
+  },
+  "mysql": {
+    "host": "localhost",
+    "port": "33060",
+    "database": "goer_hub",
+    "user": "homestead",
+    "password": "secret"
   }
 }
