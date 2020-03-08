@@ -32,10 +32,6 @@ func (u *User) Register(c *gin.Context) {
 		return
 	}
 
-	if registerRequest.Password != registerRequest.Password {
-		responseError(c, 400, "Inconsistent passwords twice")
-		return
-	}
 	password := []byte(registerRequest.Password)
 	password, err := bcrypt.GenerateFromPassword(password, bcrypt.DefaultCost)
 	if err != nil {
