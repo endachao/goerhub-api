@@ -34,6 +34,7 @@ func InitRouter() *gin.Engine {
 
 	if v, ok := binding.Validator.Engine().(*validator.Validate); ok {
 		v.RegisterValidation("username_unique", validators.UserNameValidate)
+		v.RegisterValidation("email_unique", validators.UserEmailValidate)
 	}
 
 	user := r.Group("/user")
