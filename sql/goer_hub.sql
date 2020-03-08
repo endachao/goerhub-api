@@ -9,5 +9,7 @@ CREATE TABLE `users` (
   `gold_number` int(11) NOT NULL DEFAULT '0',
   `updated_at` timestamp NULL DEFAULT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
-  PRIMARY KEY (`id`)
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `email_unique` (`email`),
+  UNIQUE KEY `username_unique` (`username`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
