@@ -10,7 +10,7 @@ type LoginRequest struct {
 
 type RegisterRequest struct {
 	Email           string `form:"email" json:"email" binding:"required,email"`
-	Username        string `form:"username" json:"username" binding:"required"`
+	Username        string `form:"username" json:"username" binding:"required,username_unique"`
 	Password        string `form:"password" json:"password" binding:"required"`
 	PasswordConfirm string `form:"password_confirm" json:"password_confirm" binding:"eqfield=Password"`
 }
