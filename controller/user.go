@@ -22,6 +22,11 @@ func (u *User) Login(c *gin.Context) (interface{}, error) {
 		return nil, jwt.ErrFailedAuthentication
 	}
 
+	err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(loginRequest.Password))
+	if err != nil {
+		return nil, jwt.ErrFailedAuthentication
+	}
+
 	return &user, nil
 }
 
