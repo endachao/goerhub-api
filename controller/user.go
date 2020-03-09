@@ -77,8 +77,11 @@ func (u *User) Register(c *gin.Context) {
 }
 
 func (u *User) Profile(c *gin.Context) {
-
-	user := u.Model.GetUserInfoByUserId(int(claims["pk"].(float64)))
+	userId, exist := c.Get("authUserId")
+	if !exist {
+		e.AbortError(c, 400, jwt.ErrForbidden)
+	}
+	user := u.Model.GetUserInfoByUserId(userId.(int))
 	c.JSON(200, gin.H{
 		"code": 200,
 		"data": map[string]interface{}{
