@@ -5,10 +5,9 @@ import (
 	"github.com/gin-gonic/gin"
 	"goerhubApi/constraint"
 	"goerhubApi/model"
+	"log"
 	"time"
 )
-
-const identityKey = "email"
 
 func AuthMiddleware(loginFunc constraint.LoginHandleFunc, loginResponse func(*gin.Context, int, string, time.Time)) (*jwt.GinJWTMiddleware, error) {
 	return jwt.New(&jwt.GinJWTMiddleware{
@@ -16,25 +15,28 @@ func AuthMiddleware(loginFunc constraint.LoginHandleFunc, loginResponse func(*gi
 		Key:         []byte("dd8Ub1JJkes7EJZawpFEknCnykW6s7Co"),
 		Timeout:     time.Hour,
 		MaxRefresh:  time.Hour,
-		IdentityKey: identityKey,
+		IdentityKey: "pk",
 		PayloadFunc: func(data interface{}) jwt.MapClaims {
+			log.Printf("PayloadFunc data %+v\n", data)
 			if v, ok := data.(*model.Users); ok {
 				return jwt.MapClaims{
-					identityKey: v.Email,
+					"pk": v.ID,
 				}
 			}
 			return jwt.MapClaims{}
 		},
 		IdentityHandler: func(c *gin.Context) interface{} {
 			claims := jwt.ExtractClaims(c)
+			log.Printf("IdentityHandler claims %+v\n", claims)
+			pk := int(claims["pk"].(float64))
 			return &model.Users{
-				Email: claims[identityKey].(string),
+				ID: pk,
 			}
 		},
 		Authenticator: loginFunc,
 		LoginResponse: loginResponse,
 		Authorizator: func(data interface{}, c *gin.Context) bool {
-			if v, ok := data.(*model.Users); ok && v.Username == "admin" {
+			if _, ok := data.(*model.Users); ok {
 				return true
 			}
 

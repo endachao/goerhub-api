@@ -28,6 +28,11 @@ func (UserModel) GetUserInfoByUserEmail(email string) (user Users, ok bool) {
 	return user, true
 }
 
+func (UserModel) GetUserInfoByUserId(userId int) (user Users) {
+	dao.DB().Where("id = ?", userId).Take(&user)
+	return
+}
+
 func (UserModel) CheckUsernameExist(username string) bool {
 	var user Users
 	if dao.DB().Where("username = ?", username).Take(&user).RecordNotFound() {

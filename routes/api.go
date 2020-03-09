@@ -47,6 +47,12 @@ func InitRouter() *gin.Engine {
 		}
 		user.POST("/login", authMiddleware.LoginHandler)
 		user.POST("/register", userController.Register)
+
+		user.Use(authMiddleware.MiddlewareFunc())
+		{
+			user.GET("/profile", userController.Profile)
+		}
+
 	}
 
 	r.GET("/", func(c *gin.Context) {

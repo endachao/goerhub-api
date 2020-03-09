@@ -63,6 +63,20 @@ func (u *User) Register(c *gin.Context) {
 	})
 }
 
+func (u *User) Profile(c *gin.Context) {
+	claims := jwt.ExtractClaims(c)
+	user := u.Model.GetUserInfoByUserId(int(claims["pk"].(float64)))
+	c.JSON(200, gin.H{
+		"code": 200,
+		"data": map[string]interface{}{
+			"username":    user.Username,
+			"nickname":    user.Nickname,
+			"email":       user.Email,
+			"gold_number": user.GoldNumber,
+		},
+	})
+}
+
 func (u *User) LoginResponse(c *gin.Context, code int, token string, expire time.Time) {
 	c.JSON(code, gin.H{
 		"code": code,
