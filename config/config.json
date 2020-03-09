@@ -1,5 +1,6 @@
 {
   "app": {
+    "name": "goerHub",
     "host": "127.0.0.1",
     "port": "8080",
     "mode": "debug"
@@ -10,5 +11,8 @@
     "database": "goer_hub",
     "user": "homestead",
     "password": "secret"
+  },
+  "jwt": {
+    "secret": "dd8Ub1JJkes7EJZawpFEknCnykW6s7Co"
   }
 }

@@ -4,8 +4,11 @@ import (
 	jwt "github.com/appleboy/gin-jwt/v2"
 	"github.com/gin-gonic/gin"
 	"goerhubApi/constraint"
+	"goerhubApi/constraint/e"
+	"goerhubApi/helpers"
 	"goerhubApi/model"
 	"golang.org/x/crypto/bcrypt"
+	"net/http"
 	"time"
 )
 
@@ -13,35 +16,45 @@ type User struct {
 	Model model.UserModel
 }
 
-func (u *User) Login(c *gin.Context) (interface{}, error) {
+func (u *User) Login(c *gin.Context) {
 	var loginRequest constraint.LoginRequest
 	if err := c.ShouldBind(&loginRequest); err != nil {
-		return nil, err
+		e.AbortError(c, 400, err)
+		return
 	}
 	user, ok := u.Model.GetUserInfoByUserEmail(loginRequest.Email)
 	if !ok {
-		return nil, jwt.ErrFailedAuthentication
+		e.AbortError(c, 400, jwt.ErrFailedAuthentication)
+		return
 	}
 
 	err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(loginRequest.Password))
 	if err != nil {
-		return nil, jwt.ErrFailedAuthentication
+		e.AbortError(c, 400, jwt.ErrFailedAuthentication)
+		return
 	}
 
-	return &user, nil
+	token, _ := helpers.GenerateToken(user.ID)
+	c.JSON(http.StatusOK, gin.H{
+		"code":    200,
+		"message": "",
+		"data": map[string]interface{}{
+			"auth": token,
+		},
+	})
 }
 
 func (u *User) Register(c *gin.Context) {
 	var registerRequest constraint.RegisterRequest
 	if err := c.ShouldBind(&registerRequest); err != nil {
-		responseError(c, 400, err.Error())
+		e.AbortError(c, 400, err)
 		return
 	}
 
 	password := []byte(registerRequest.Password)
 	password, err := bcrypt.GenerateFromPassword(password, bcrypt.DefaultCost)
 	if err != nil {
-		responseError(c, 400, err.Error())
+		e.AbortError(c, 400, err)
 		return
 	}
 
@@ -54,7 +67,7 @@ func (u *User) Register(c *gin.Context) {
 
 	err = u.Model.CreateUser(user)
 	if err != nil {
-		responseError(c, 400, err.Error())
+		e.AbortError(c, 400, err)
 		return
 	}
 
@@ -64,7 +77,7 @@ func (u *User) Register(c *gin.Context) {
 }
 
 func (u *User) Profile(c *gin.Context) {
-	claims := jwt.ExtractClaims(c)
+
 	user := u.Model.GetUserInfoByUserId(int(claims["pk"].(float64)))
 	c.JSON(200, gin.H{
 		"code": 200,

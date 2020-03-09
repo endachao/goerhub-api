@@ -1,55 +1,36 @@
 package middleware
 
 import (
+	"errors"
 	jwt "github.com/appleboy/gin-jwt/v2"
 	"github.com/gin-gonic/gin"
-	"goerhubApi/constraint"
-	"goerhubApi/model"
+	"goerhubApi/constraint/e"
+	"goerhubApi/helpers"
 	"log"
 	"time"
 )
 
-func AuthMiddleware(loginFunc constraint.LoginHandleFunc, loginResponse func(*gin.Context, int, string, time.Time)) (*jwt.GinJWTMiddleware, error) {
-	return jwt.New(&jwt.GinJWTMiddleware{
-		Realm:       "goer hub",
-		Key:         []byte("dd8Ub1JJkes7EJZawpFEknCnykW6s7Co"),
-		Timeout:     time.Hour,
-		MaxRefresh:  time.Hour,
-		IdentityKey: "pk",
-		PayloadFunc: func(data interface{}) jwt.MapClaims {
-			log.Printf("PayloadFunc data %+v\n", data)
-			if v, ok := data.(*model.Users); ok {
-				return jwt.MapClaims{
-					"pk": v.ID,
-				}
-			}
-			return jwt.MapClaims{}
-		},
-		IdentityHandler: func(c *gin.Context) interface{} {
-			claims := jwt.ExtractClaims(c)
-			log.Printf("IdentityHandler claims %+v\n", claims)
-			pk := int(claims["pk"].(float64))
-			return &model.Users{
-				ID: pk,
-			}
-		},
-		Authenticator: loginFunc,
-		LoginResponse: loginResponse,
-		Authorizator: func(data interface{}, c *gin.Context) bool {
-			if _, ok := data.(*model.Users); ok {
-				return true
-			}
+func AuthMiddleware() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		token := c.GetHeader("Authorization")
+		if token == "" {
+			e.AbortError(c, 401, errors.New("token is empty"))
+			return
+		}
+		n := token[7:]
+		log.Printf("%s\n", token)
+		log.Printf("%s\n", n)
+		claims, err := helpers.ParseToken(n)
+		if err != nil {
+			e.AbortError(c, 401, jwt.ErrInvalidSigningAlgorithm)
+			return
+		}
 
-			return false
-		},
-		Unauthorized: func(c *gin.Context, code int, message string) {
-			c.JSON(code, gin.H{
-				"code":    code,
-				"message": message,
-			})
-		},
-		TokenLookup:   "header: Authorization, query: token, cookie: jwt",
-		TokenHeadName: "Bearer",
-		TimeFunc:      time.Now,
-	})
+		if time.Now().Unix() > claims.ExpiresAt {
+			e.AbortError(c, 401, jwt.ErrExpiredToken)
+			return
+		}
+
+		c.Next()
+	}
 }

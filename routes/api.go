@@ -41,14 +41,15 @@ func InitRouter() *gin.Engine {
 	{
 		// controller and middleware
 		userController := controller.User{Model: model.UserModel{}}
-		authMiddleware, err := middleware.AuthMiddleware(userController.Login, userController.LoginResponse)
-		if err != nil {
-			panic(err)
-		}
-		user.POST("/login", authMiddleware.LoginHandler)
+		//authMiddleware, err := middleware.AuthMiddleware()
+		//if err != nil {
+		//	panic(err)
+		//}
+
+		user.POST("/login", userController.Login)
 		user.POST("/register", userController.Register)
 
-		user.Use(authMiddleware.MiddlewareFunc())
+		user.Use(middleware.AuthMiddleware())
 		{
 			user.GET("/profile", userController.Profile)
 		}
