@@ -41,7 +41,7 @@ func InitRouter() *gin.Engine {
 	{
 		// controller and middleware
 		userController := controller.User{Model: model.UserModel{}}
-		authMiddleware, err := middleware.AuthMiddleware(userController.Login)
+		authMiddleware, err := middleware.AuthMiddleware(userController.Login, userController.LoginResponse)
 		if err != nil {
 			panic(err)
 		}

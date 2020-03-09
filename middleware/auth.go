@@ -10,7 +10,7 @@ import (
 
 const identityKey = "email"
 
-func AuthMiddleware(loginFunc constraint.LoginHandleFunc) (*jwt.GinJWTMiddleware, error) {
+func AuthMiddleware(loginFunc constraint.LoginHandleFunc, loginResponse func(*gin.Context, int, string, time.Time)) (*jwt.GinJWTMiddleware, error) {
 	return jwt.New(&jwt.GinJWTMiddleware{
 		Realm:       "goer hub",
 		Key:         []byte("dd8Ub1JJkes7EJZawpFEknCnykW6s7Co"),
@@ -32,6 +32,7 @@ func AuthMiddleware(loginFunc constraint.LoginHandleFunc) (*jwt.GinJWTMiddleware
 			}
 		},
 		Authenticator: loginFunc,
+		LoginResponse: loginResponse,
 		Authorizator: func(data interface{}, c *gin.Context) bool {
 			if v, ok := data.(*model.Users); ok && v.Username == "admin" {
 				return true

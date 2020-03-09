@@ -6,6 +6,7 @@ import (
 	"goerhubApi/constraint"
 	"goerhubApi/model"
 	"golang.org/x/crypto/bcrypt"
+	"time"
 )
 
 type User struct {
@@ -59,5 +60,15 @@ func (u *User) Register(c *gin.Context) {
 
 	c.JSON(200, gin.H{
 		"username": user.Username,
+	})
+}
+
+func (u *User) LoginResponse(c *gin.Context, code int, token string, expire time.Time) {
+	c.JSON(code, gin.H{
+		"code": code,
+		"data": map[string]string{
+			"token":  token,
+			"expire": expire.Format(time.RFC3339),
+		},
 	})
 }
