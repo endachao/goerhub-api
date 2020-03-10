@@ -1,7 +1,6 @@
 package controller
 
 import (
-	jwt "github.com/appleboy/gin-jwt/v2"
 	"github.com/gin-gonic/gin"
 	"goerhubApi/constraint"
 	"goerhubApi/constraint/e"
@@ -24,13 +23,13 @@ func (u *User) Login(c *gin.Context) {
 	}
 	user, ok := u.Model.GetUserInfoByUserEmail(loginRequest.Email)
 	if !ok {
-		e.AbortError(c, 400, jwt.ErrFailedAuthentication)
+		e.AbortError(c, 400, e.ErrFailedAuthentication)
 		return
 	}
 
 	err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(loginRequest.Password))
 	if err != nil {
-		e.AbortError(c, 400, jwt.ErrFailedAuthentication)
+		e.AbortError(c, 400, e.ErrFailedAuthentication)
 		return
 	}
 
@@ -79,7 +78,7 @@ func (u *User) Register(c *gin.Context) {
 func (u *User) Profile(c *gin.Context) {
 	userId, exist := c.Get("authUserId")
 	if !exist {
-		e.AbortError(c, 400, jwt.ErrForbidden)
+		e.AbortError(c, 400, e.ErrForbidden)
 	}
 	user := u.Model.GetUserInfoByUserId(userId.(int))
 	c.JSON(200, gin.H{

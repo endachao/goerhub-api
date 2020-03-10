@@ -1,7 +1,6 @@
 package middleware
 
 import (
-	jwt "github.com/appleboy/gin-jwt/v2"
 	"github.com/gin-gonic/gin"
 	"goerhubApi/constraint/e"
 	"goerhubApi/helpers"
@@ -13,7 +12,7 @@ func AuthMiddleware() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		token := c.GetHeader("Authorization")
 		if token == "" {
-			e.AbortError(c, 401, jwt.ErrEmptyAuthHeader)
+			e.AbortError(c, 401, e.ErrEmptyAuthHeader)
 			return
 		}
 		n := token[7:]
@@ -21,12 +20,12 @@ func AuthMiddleware() gin.HandlerFunc {
 		log.Printf("%s\n", n)
 		claims, err := helpers.ParseToken(n)
 		if err != nil {
-			e.AbortError(c, 401, jwt.ErrInvalidSigningAlgorithm)
+			e.AbortError(c, 401, e.ErrInvalidSigningAlgorithm)
 			return
 		}
 
 		if time.Now().Unix() > claims.ExpiresAt {
-			e.AbortError(c, 401, jwt.ErrExpiredToken)
+			e.AbortError(c, 401, e.ErrExpiredToken)
 			return
 		}
 		c.Set("authUserId", claims.UserId)
