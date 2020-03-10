@@ -4,7 +4,6 @@ import (
 	"github.com/gin-gonic/gin"
 	"goerhubApi/constraint/e"
 	"goerhubApi/helpers/auth"
-	"log"
 	"time"
 )
 
@@ -16,8 +15,6 @@ func AuthMiddleware() gin.HandlerFunc {
 			return
 		}
 		n := token[7:]
-		log.Printf("%s\n", token)
-		log.Printf("%s\n", n)
 		claims, err := auth.ParseToken(n)
 		if err != nil {
 			e.AbortError(c, 401, e.ErrInvalidSigningAlgorithm)

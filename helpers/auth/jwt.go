@@ -55,5 +55,5 @@ func GetUserId(c *gin.Context) (value int, exists bool) {
 	if !exist {
 		return
 	}
-	return claims.(Claims).UserId, true
+	return claims.(*Claims).UserId, true
 }
