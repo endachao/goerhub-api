@@ -4,6 +4,7 @@ import (
 	"github.com/dgrijalva/jwt-go"
 	"github.com/gin-gonic/gin"
 	"github.com/spf13/viper"
+	"goerhubApi/constraint/e"
 	"time"
 )
 
@@ -56,4 +57,27 @@ func GetUserId(c *gin.Context) (value int, exists bool) {
 		return
 	}
 	return claims.(*Claims).UserId, true
+}
+
+func AuthMiddleware() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		token := c.GetHeader("Authorization")
+		if token == "" {
+			e.AbortError(c, 401, e.ErrEmptyAuthHeader)
+			return
+		}
+		n := token[7:]
+		claims, err := ParseToken(n)
+		if err != nil {
+			e.AbortError(c, 401, e.ErrInvalidSigningAlgorithm)
+			return
+		}
+
+		if time.Now().Unix() > claims.ExpiresAt {
+			e.AbortError(c, 401, e.ErrExpiredToken)
+			return
+		}
+		c.Set("JWT-AUTH-USER", claims)
+		c.Next()
+	}
 }

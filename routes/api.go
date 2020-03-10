@@ -6,7 +6,7 @@ import (
 	"github.com/spf13/viper"
 	"goerhubApi/constraint/requestValidate"
 	"goerhubApi/controller"
-	"goerhubApi/middleware"
+	"goerhubApi/middleware/auth"
 	"goerhubApi/model"
 	"gopkg.in/go-playground/validator.v9"
 )
@@ -28,7 +28,7 @@ func InitRouter() *gin.Engine {
 		user.POST("/login", userController.Login)
 		user.POST("/register", userController.Register)
 
-		user.Use(middleware.AuthMiddleware())
+		user.Use(auth.AuthMiddleware())
 		{
 			user.GET("/profile", userController.Profile)
 		}

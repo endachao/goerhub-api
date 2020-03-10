@@ -4,7 +4,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"goerhubApi/constraint"
 	"goerhubApi/constraint/e"
-	"goerhubApi/helpers/auth"
+	"goerhubApi/middleware/auth"
 	"goerhubApi/model"
 	"golang.org/x/crypto/bcrypt"
 	"net/http"
