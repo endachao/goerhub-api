@@ -8,7 +8,6 @@ import (
 	"goerhubApi/model"
 	"golang.org/x/crypto/bcrypt"
 	"net/http"
-	"time"
 )
 
 type User struct {
@@ -33,14 +32,7 @@ func (u *User) Login(c *gin.Context) {
 		return
 	}
 
-	token, _ := auth.GenerateToken(user.ID)
-	c.JSON(http.StatusOK, gin.H{
-		"code":    200,
-		"message": "",
-		"data": map[string]interface{}{
-			"auth": token,
-		},
-	})
+	u.userResponse(c, user)
 }
 
 func (u *User) Register(c *gin.Context) {
@@ -70,9 +62,7 @@ func (u *User) Register(c *gin.Context) {
 		return
 	}
 
-	c.JSON(200, gin.H{
-		"username": user.Username,
-	})
+	u.userResponse(c, user)
 }
 
 func (u *User) Profile(c *gin.Context) {
@@ -81,23 +71,22 @@ func (u *User) Profile(c *gin.Context) {
 		e.AbortError(c, 400, e.ErrForbidden)
 	}
 	user := u.Model.GetUserInfoByUserId(userId)
-	c.JSON(200, gin.H{
-		"code": 200,
-		"data": map[string]interface{}{
-			"username":    user.Username,
-			"nickname":    user.Nickname,
-			"email":       user.Email,
-			"gold_number": user.GoldNumber,
-		},
-	})
+	u.userResponse(c, user)
 }
 
-func (u *User) LoginResponse(c *gin.Context, code int, token string, expire time.Time) {
-	c.JSON(code, gin.H{
-		"code": code,
-		"data": map[string]string{
-			"token":  token,
-			"expire": expire.Format(time.RFC3339),
+func (u *User) userResponse(c *gin.Context, user model.Users) {
+	token, _ := auth.GenerateToken(user.ID)
+	c.JSON(http.StatusOK, gin.H{
+		"code":    200,
+		"message": "success",
+		"data": map[string]interface{}{
+			"auth": token,
+			"profile": map[string]interface{}{
+				"username":    user.Username,
+				"nickname":    user.Nickname,
+				"email":       user.Email,
+				"gold_number": user.GoldNumber,
+			},
 		},
 	})
 }

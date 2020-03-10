@@ -18,8 +18,8 @@ func InitRouter() *gin.Engine {
 	r := gin.Default()
 
 	if v, ok := binding.Validator.Engine().(*validator.Validate); ok {
-		v.RegisterValidation("username_unique", requestValidate.UserNameValidate)
-		v.RegisterValidation("email_unique", requestValidate.UserEmailValidate)
+		_ = v.RegisterValidation("username_unique", requestValidate.UserNameValidate)
+		_ = v.RegisterValidation("email_unique", requestValidate.UserEmailValidate)
 	}
 
 	user := r.Group("/user")
