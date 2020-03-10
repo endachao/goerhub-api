@@ -1,7 +1,8 @@
-package helpers
+package auth
 
 import (
 	"github.com/dgrijalva/jwt-go"
+	"github.com/gin-gonic/gin"
 	"github.com/spf13/viper"
 	"time"
 )
@@ -47,4 +48,12 @@ func ParseToken(token string) (*Claims, error) {
 		}
 	}
 	return nil, err
+}
+
+func GetUserId(c *gin.Context) (value int, exists bool) {
+	claims, exist := c.Get("JWT-AUTH-USER")
+	if !exist {
+		return
+	}
+	return claims.(Claims).UserId, true
 }

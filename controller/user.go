@@ -4,7 +4,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"goerhubApi/constraint"
 	"goerhubApi/constraint/e"
-	"goerhubApi/helpers"
+	"goerhubApi/helpers/auth"
 	"goerhubApi/model"
 	"golang.org/x/crypto/bcrypt"
 	"net/http"
@@ -33,7 +33,7 @@ func (u *User) Login(c *gin.Context) {
 		return
 	}
 
-	token, _ := helpers.GenerateToken(user.ID)
+	token, _ := auth.GenerateToken(user.ID)
 	c.JSON(http.StatusOK, gin.H{
 		"code":    200,
 		"message": "",
@@ -76,11 +76,11 @@ func (u *User) Register(c *gin.Context) {
 }
 
 func (u *User) Profile(c *gin.Context) {
-	userId, exist := c.Get("authUserId")
+	userId, exist := auth.GetUserId(c)
 	if !exist {
 		e.AbortError(c, 400, e.ErrForbidden)
 	}
-	user := u.Model.GetUserInfoByUserId(userId.(int))
+	user := u.Model.GetUserInfoByUserId(userId)
 	c.JSON(200, gin.H{
 		"code": 200,
 		"data": map[string]interface{}{

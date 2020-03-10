@@ -3,7 +3,7 @@ package middleware
 import (
 	"github.com/gin-gonic/gin"
 	"goerhubApi/constraint/e"
-	"goerhubApi/helpers"
+	"goerhubApi/helpers/auth"
 	"log"
 	"time"
 )
@@ -18,7 +18,7 @@ func AuthMiddleware() gin.HandlerFunc {
 		n := token[7:]
 		log.Printf("%s\n", token)
 		log.Printf("%s\n", n)
-		claims, err := helpers.ParseToken(n)
+		claims, err := auth.ParseToken(n)
 		if err != nil {
 			e.AbortError(c, 401, e.ErrInvalidSigningAlgorithm)
 			return
@@ -28,7 +28,7 @@ func AuthMiddleware() gin.HandlerFunc {
 			e.AbortError(c, 401, e.ErrExpiredToken)
 			return
 		}
-		c.Set("authUserId", claims.UserId)
+		c.Set("JWT-AUTH-USER", claims)
 		c.Next()
 	}
 }
