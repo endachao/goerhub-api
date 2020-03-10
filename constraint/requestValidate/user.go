@@ -1,4 +1,4 @@
-package validators
+package requestValidate
 
 import (
 	"goerhubApi/model"

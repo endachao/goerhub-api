@@ -1,6 +1,8 @@
 package constraint
 
-import "github.com/gin-gonic/gin"
+import (
+	"github.com/gin-gonic/gin"
+)
 
 type LoginHandleFunc func(c *gin.Context) (interface{}, error)
 type LoginRequest struct {
